@@ -1,6 +1,6 @@
 from PyQt6 import QtGui, QtWidgets
 from const import DEFAULT_BOARD_IMAGES, TILE_SIZE
-from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtCore import Qt
 from custom_label import QLabelCustom
 from helper_functions import LabelHelperFunctions
 

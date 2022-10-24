@@ -9,51 +9,57 @@ import re
 class QLabelCustom(QtWidgets.QLabel):
     def __init__(self, parent: QObject, filename: str, objectName: str, geometry: Tuple[int, int, int, int], *args, **kwargs) -> None:
         super().__init__(parent=parent, objectName=objectName, *args, **kwargs)
-        self.set_dragged_status(False)
-        self.set_bg_color()
+        self.dragged_status = False
+        self.bg_color = objectName
         self.setFixedSize(TILE_SIZE, TILE_SIZE)
         self.setAlignment(QtCore.Qt.Alignment.AlignCenter)
         self.setPixmap(filename)
         self.setGeometry(*geometry)
 
     def setPixmap(self, filename: str) -> None:
-        self.set_filename(filename)
+        self.filename = filename
         super().setPixmap(QtGui.QPixmap(filename))
 
     def mouseMoveEvent(self, e) -> None:
-        if e.buttons() != Qt.MouseButtons.LeftButton or "blank" in self.get_filename():
+        if e.buttons() != Qt.MouseButtons.LeftButton or "blank" in self.filename:
             return
 
-        self.set_dragged_status(True)
+        self.dragged_status = True
 
         drag = QDrag(self)
         drag.setMimeData(QMimeData())
         drag.setHotSpot(e.position().toPoint() - self.rect().center())
         drag.exec(Qt.DropActions.MoveAction)
 
-    def set_dragged_status(self, status: bool) -> None:
-        self.__dragged = status
+    @property
+    def dragged_status(self) -> bool:
+        return self._dragged
 
-    def get_dragged_status(self) -> bool:
-        return self.__dragged
+    @dragged_status.setter
+    def dragged_status(self, status: bool) -> None:
+        self._dragged = status
     
-    def get_filename(self) -> str:
-        return self.__filename
+    @property
+    def filename(self) -> str:
+        return self._filename
     
-    def set_filename(self, filename: str) -> None:
-        self.__filename = filename
+    @filename.setter
+    def filename(self, filename: str) -> None:
+        self._filename = filename
 
-    def set_bg_color(self) -> None:
-        objectName = self.objectName().replace("label_", "")
+    @property
+    def bg_color(self) -> str:
+        return self._bg_color
+
+    @bg_color.setter
+    def bg_color(self, objectName: str) -> None:
+        objectName = objectName.replace("label_", "")
         if (ord(objectName[0]) + int(objectName[1])) % 2 == 0:
-            self.__bg_color = Color.WHITE.value
+            self._bg_color = Color.WHITE.value
         else:
-            self.__bg_color = Color.BLACK.value
+            self._bg_color = Color.BLACK.value
 
-        self.update_stylesheet("background-color", self.get_bg_color())
-    
-    def get_bg_color(self) -> str:
-        return self.__bg_color
+        self.update_stylesheet("background-color", self.bg_color)
     
     def update_stylesheet(self, property: str, value: str) -> None:
         match = re.search(f"{property}: [^;]*;", self.styleSheet())

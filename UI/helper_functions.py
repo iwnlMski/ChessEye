@@ -13,14 +13,13 @@ class LabelHelperFunctions():
     @staticmethod
     def get_label_by_dragged_status(list_of_objects: List[QObject]) -> Union[QLabelCustom, None]:
         for obj in list_of_objects:
-            if isinstance(obj, QLabelCustom) and obj.get_dragged_status():
-                obj.set_dragged_status(False)
+            if isinstance(obj, QLabelCustom) and obj.dragged_status:
+                obj.dragged_status = False
                 return obj
 
     @staticmethod
     def swap_two_labels(label_1: QLabelCustom, label_2: QLabelCustom) -> None:
-        label_1_filename = label_1.get_filename()
-        label_2_filename = label_2.get_filename()
+        label_1_filename, label_2_filename = label_1.filename, label_2.filename
 
         label_1.setPixmap(label_2_filename)
         label_2.setPixmap(label_1_filename)
