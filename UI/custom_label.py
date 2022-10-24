@@ -9,14 +9,16 @@ import re
 class QLabelCustom(QtWidgets.QLabel):
     def __init__(self, parent: QObject, filename: str, objectName: str, geometry: Tuple[int, int, int, int], *args, **kwargs) -> None:
         super().__init__(parent=parent, objectName=objectName, *args, **kwargs)
-        self.set_filename(filename)
-        self.update_start_pos()
         self.set_dragged_status(False)
         self.set_bg_color()
         self.setFixedSize(TILE_SIZE, TILE_SIZE)
         self.setAlignment(QtCore.Qt.Alignment.AlignCenter)
-        self.setPixmap(QtGui.QPixmap(filename))
+        self.setPixmap(filename)
         self.setGeometry(*geometry)
+
+    def setPixmap(self, filename: str) -> None:
+        self.set_filename(filename)
+        super().setPixmap(QtGui.QPixmap(filename))
 
     def mouseMoveEvent(self, e) -> None:
         if e.buttons() != Qt.MouseButtons.LeftButton or "blank" in self.get_filename():
@@ -24,19 +26,10 @@ class QLabelCustom(QtWidgets.QLabel):
 
         self.set_dragged_status(True)
 
-        mimeData = QMimeData()
-
         drag = QDrag(self)
-        drag.setMimeData(mimeData)
+        drag.setMimeData(QMimeData())
         drag.setHotSpot(e.position().toPoint() - self.rect().center())
         drag.exec(Qt.DropActions.MoveAction)
-    
-    def update_start_pos(self) -> None:
-        self.start_x = self.x()
-        self.start_y = self.y()
-
-    def get_start_pos(self) -> Tuple[int, int]:
-        return self.start_x, self.start_y
 
     def set_dragged_status(self, status: bool) -> None:
         self.__dragged = status

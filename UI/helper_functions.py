@@ -19,17 +19,8 @@ class LabelHelperFunctions():
 
     @staticmethod
     def swap_two_labels(label_1: QLabelCustom, label_2: QLabelCustom) -> None:
-        label_1.move(*label_2.get_start_pos())
-        label_2.move(*label_1.get_start_pos())
+        label_1_filename = label_1.get_filename()
+        label_2_filename = label_2.get_filename()
 
-        label_1_name = label_1.objectName()
-        label_2_name = label_2.objectName()
-
-        label_1.setObjectName(label_2_name)
-        label_2.setObjectName(label_1_name)
-
-        label_1.set_bg_color()
-        label_2.set_bg_color()
-
-        label_2.update_start_pos()
-        label_1.update_start_pos()
+        label_1.setPixmap(label_2_filename)
+        label_2.setPixmap(label_1_filename)

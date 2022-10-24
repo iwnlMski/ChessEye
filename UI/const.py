@@ -2,7 +2,7 @@ from enum import Enum
 
 TILE_SIZE = 60
 
-default_board = {
+DEFAULT_BOARD_IMAGES = {
         "A8": "../img/black_rook.png",
         "B8": "../img/black_knight.png",
         "C8": "../img/black_bishop.png",
