@@ -118,21 +118,16 @@ class UnclickableLabel(QtWidgets.QLabel):
         super().__init__(*args, **kwargs)
 
     def mouseDoubleClickEvent(self, a0: QtGui.QMouseEvent) -> None:
-        print("I am not working")
         return None
 
     def mouseMoveEvent(self, ev: QtGui.QMouseEvent) -> None:
-        print("I am not working")
         return None
 
     def mousePressEvent(self, ev: QtGui.QMouseEvent) -> None:
-        print("I am not working")
         return None
 
     def mouseReleaseEvent(self, ev: QtGui.QMouseEvent) -> None:
-        print("I am not working")
         return None
 
     def dragMoveEvent(self, a0: QtGui.QDragMoveEvent) -> None:
-        print("DRAGGGG")
         return None
