@@ -3,6 +3,7 @@ from const import DEFAULT_BOARD_IMAGES, TILE_SIZE
 from PyQt6.QtCore import Qt, QRect
 from custom_label import QLabelCustom
 from helper_functions import LabelHelperFunctions
+from board_state import BoardState
 
 
 class QPushButtonCustom(QtWidgets.QPushButton):
@@ -32,7 +33,7 @@ class MainWindow(QtWidgets.QMainWindow):
             for char in range(ord("A"), ord("I")):
                 _ = QLabelCustom(
                     parent=self.centralwidget,
-                    filename=DEFAULT_BOARD_IMAGES.get(f"{chr(char)}{i}", "../img/blank.png"),
+                    filename=DEFAULT_BOARD_IMAGES.get(f"{chr(char)}{i}", ""),
                     objectName=f"label_{chr(char)}{i}",
                     geometry=((char-ord("A"))*TILE_SIZE, (i-1)*TILE_SIZE, TILE_SIZE, TILE_SIZE)
                     )
@@ -45,9 +46,15 @@ class MainWindow(QtWidgets.QMainWindow):
         dragged_label = LabelHelperFunctions.get_label_by_dragged_status(self.centralwidget.children())
 
         if drop_position_label and dragged_label:
+            LabelHelperFunctions.swap_two_labels(drop_position_label, dragged_label)
             
             event.setDropAction(Qt.DropActions.MoveAction)
             event.accept()
+
+    def get_board_state(self):
+        bs = BoardState(self.centralWidget().children())
+
+        print(bs.to_json())
 
 
 if __name__ == "__main__":
@@ -55,4 +62,5 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = MainWindow()
     MainWindow.show()
+    MainWindow.get_board_state()
     sys.exit(app.exec())

@@ -21,7 +21,7 @@ class QLabelCustom(QtWidgets.QLabel):
         super().setPixmap(QtGui.QPixmap(filename))
 
     def mouseMoveEvent(self, e) -> None:
-        if e.buttons() != Qt.MouseButtons.LeftButton or "blank" in self.filename:
+        if e.buttons() != Qt.MouseButtons.LeftButton or not self.filename:
             return
 
         self.dragged_status = True
