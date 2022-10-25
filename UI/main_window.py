@@ -75,12 +75,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 event.setDropAction(Qt.DropActions.MoveAction)
                 event.accept()
         elif dragged_label and not drop_position_label:
-            LabelHelperFunctions.update_piece_stack(
-                dragged_label, self.centralWidget().children())
-            LabelHelperFunctions.delete_piece_from_board(dragged_label)
+            if isinstance(dragged_label, QLabelCustom):
+                LabelHelperFunctions.update_piece_stack(
+                    dragged_label, self.centralWidget().children())
+                LabelHelperFunctions.delete_piece_from_board(dragged_label)
 
-            event.setDropAction(Qt.DropActions.MoveAction)
-            event.accept()
+                event.setDropAction(Qt.DropActions.MoveAction)
+                event.accept()
 
 
 if __name__ == "__main__":

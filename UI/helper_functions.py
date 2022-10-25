@@ -31,9 +31,9 @@ class LabelHelperFunctions():
             "../img/", "").replace(".png", "")
         for obj in list_of_objects:
             if obj.objectName() == "stack_piece_counter_" + piece_name:
-                if pieces_on_board := int(obj.text()) > 0:
+                if int(obj.text()) > 0:
                     label_2.setPixmap(label_1.filename)
-                    obj.setText(str(pieces_on_board - 1))
+                    obj.setText(str(int(obj.text()) - 1))
                 else:
                     return
 
