@@ -1,8 +1,17 @@
 from PyQt6 import QtGui, QtWidgets
 from const import DEFAULT_BOARD_IMAGES, TILE_SIZE
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QRect
 from custom_label import QLabelCustom
 from helper_functions import LabelHelperFunctions
+
+
+class QPushButtonCustom(QtWidgets.QPushButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        
+        return super().mousePressEvent(event)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -14,6 +23,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.centralwidget = QtWidgets.QWidget(self, objectName="centralwidget")
         self.setCentralWidget(self.centralwidget)
+
+        self.pushButton = QPushButtonCustom(self.centralwidget)
+        self.pushButton.setGeometry(QRect(500, 170, 75, 24))
+        self.pushButton.setObjectName("pushButton")
 
         for i in range(8, 0, -1):
             for char in range(ord("A"), ord("I")):
@@ -32,7 +45,6 @@ class MainWindow(QtWidgets.QMainWindow):
         dragged_label = LabelHelperFunctions.get_label_by_dragged_status(self.centralwidget.children())
 
         if drop_position_label and dragged_label:
-            LabelHelperFunctions.swap_two_labels(drop_position_label, dragged_label)
             
             event.setDropAction(Qt.DropActions.MoveAction)
             event.accept()

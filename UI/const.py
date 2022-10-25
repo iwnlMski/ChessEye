@@ -1,6 +1,8 @@
 from enum import Enum
 
 TILE_SIZE = 60
+FILEPATH_PREFIX = "../img/"
+FILETYPE_EXTENSION = ".png"
 
 DEFAULT_BOARD_IMAGES = {
         "A8": "../img/black_rook.png",
