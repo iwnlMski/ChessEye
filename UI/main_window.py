@@ -1,7 +1,7 @@
 from PyQt6 import QtGui, QtWidgets
-from const import DEFAULT_BOARD_IMAGES, TILE_SIZE
+from const import DEFAULT_BOARD_IMAGES, TILE_SIZE, Piece
 from PyQt6.QtCore import Qt
-from custom_label import QLabelCustom
+from custom_label import QLabelCustom, StackPieceLabel
 from helper_functions import LabelHelperFunctions
 
 
@@ -12,28 +12,43 @@ class MainWindow(QtWidgets.QMainWindow):
         self.resize(700, 700)
         self.setAcceptDrops(True)
 
-        self.centralwidget = QtWidgets.QWidget(self, objectName="centralwidget")
+        self.centralwidget = QtWidgets.QWidget(
+            self, objectName="centralwidget")
         self.setCentralWidget(self.centralwidget)
 
         for i in range(8, 0, -1):
             for char in range(ord("A"), ord("I")):
-                _ = QLabelCustom(
+                QLabelCustom(
                     parent=self.centralwidget,
-                    filename=DEFAULT_BOARD_IMAGES.get(f"{chr(char)}{i}", "../img/blank.png"),
+                    filename=DEFAULT_BOARD_IMAGES.get(
+                        f"{chr(char)}{i}", "../img/blank.png"),
                     objectName=f"label_{chr(char)}{i}",
-                    geometry=((char-ord("A"))*TILE_SIZE, (i-1)*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                    )
+                    geometry=((char-ord("A"))*TILE_SIZE, (i-1)
+                              * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                )
+
+        for i, piece in enumerate(Piece):
+            x_coord = 500 if "WHITE" in piece.name else 560
+            StackPieceLabel(
+                parent=self.centralwidget,
+                filename=piece.value,
+                objectName=f"label_{piece.name.lower()}",
+                geometry=(x_coord, (i%6) * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            )
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         event.accept()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
-        drop_position_label = LabelHelperFunctions.get_label_by_position(event.position().x(), event.position().y(), self.centralwidget.children())
-        dragged_label = LabelHelperFunctions.get_label_by_dragged_status(self.centralwidget.children())
+        drop_position_label = LabelHelperFunctions.get_label_by_position(
+            event.position().x(), event.position().y(), self.centralwidget.children())
+        dragged_label = LabelHelperFunctions.get_label_by_dragged_status(
+            self.centralwidget.children())
 
         if drop_position_label and dragged_label:
-            LabelHelperFunctions.swap_two_labels(drop_position_label, dragged_label)
-            
+            LabelHelperFunctions.swap_two_labels(
+                drop_position_label, dragged_label)
+
             event.setDropAction(Qt.DropActions.MoveAction)
             event.accept()
 

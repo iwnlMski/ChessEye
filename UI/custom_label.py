@@ -68,3 +68,20 @@ class QLabelCustom(QtWidgets.QLabel):
         else:
             self.setStyleSheet(self.styleSheet() + f" {property}: {value};")
         
+    
+class StackPieceLabel(QtWidgets.QLabel):
+    def __init__(self, parent: QObject, filename: str, objectName: str, geometry: Tuple[int, int, int, int], *args, **kwargs) -> None:
+        super().__init__(parent=parent, objectName=objectName, *args, **kwargs)
+        self.setFixedSize(TILE_SIZE, TILE_SIZE)
+        self.setAlignment(QtCore.Qt.Alignment.AlignCenter)
+        self.setPixmap(QtGui.QPixmap(filename))
+        self.setGeometry(*geometry)
+
+    def mouseMoveEvent(self, e) -> None:
+        if e.buttons() != Qt.MouseButtons.LeftButton:
+            return
+
+        drag = QDrag(self)
+        drag.setMimeData(QMimeData())
+        drag.setHotSpot(e.position().toPoint() - self.rect().center())
+        drag.exec(Qt.DropActions.MoveAction)

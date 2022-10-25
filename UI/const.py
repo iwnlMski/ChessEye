@@ -37,6 +37,21 @@ DEFAULT_BOARD_IMAGES = {
         "H1": "../img/white_rook.png",
     }
 
+class Piece(Enum):
+    WHITE_PAWN = "../img/white_pawn.png"
+    WHITE_ROOK = "../img/white_rook.png"
+    WHITE_KNIGHT = "../img/white_knight.png"
+    WHITE_BISHOP = "../img/white_bishop.png"
+    WHITE_QUEEN = "../img/white_queen.png"
+    WHITE_KING = "../img/white_king.png"
+    BLACK_PAWN = "../img/black_pawn.png"
+    BLACK_ROOK = "../img/black_rook.png"
+    BLACK_KNIGHT = "../img/black_knight.png"
+    BLACK_BISHOP = "../img/black_bishop.png"
+    BLACK_QUEEN = "../img/black_queen.png"
+    BLACK_KING = "../img/black_king.png"
+
+
 class Color(Enum):
     WHITE = "white"
     BLACK = "black"
