@@ -1,7 +1,8 @@
 from const import TILE_SIZE
 from typing import List, Union
 from PyQt6.QtCore import QObject
-from custom_label import QLabelCustom
+from custom_label import QLabelCustom, UnclickableLabel
+
 
 class LabelHelperFunctions():
     @staticmethod
@@ -13,7 +14,7 @@ class LabelHelperFunctions():
     @staticmethod
     def get_label_by_dragged_status(list_of_objects: List[QObject]) -> Union[QLabelCustom, None]:
         for obj in list_of_objects:
-            if isinstance(obj, QLabelCustom) and obj.dragged_status:
+            if not isinstance(obj, UnclickableLabel) and obj.dragged_status:
                 obj.dragged_status = False
                 return obj
 
@@ -23,3 +24,27 @@ class LabelHelperFunctions():
 
         label_1.setPixmap(label_2_filename)
         label_2.setPixmap(label_1_filename)
+
+    @staticmethod
+    def add_piece_from_stack(label_1: QLabelCustom, label_2: QLabelCustom, list_of_objects: List[QObject]):
+        piece_name = label_1.filename.replace(
+            "../img/", "").replace(".png", "")
+        for obj in list_of_objects:
+            if obj.objectName() == "stack_piece_counter_" + piece_name:
+                if pieces_on_board := int(obj.text()) > 0:
+                    label_2.setPixmap(label_1.filename)
+                    obj.setText(str(pieces_on_board - 1))
+                else:
+                    return
+
+    @staticmethod
+    def delete_piece_from_board(label_1: QLabelCustom):
+        label_1.setPixmap("")
+
+    @staticmethod
+    def update_piece_stack(label_1: QLabelCustom, list_of_objects: List[QObject]):
+        piece_name = label_1.filename.replace(
+            "../img/", "").replace(".png", "")
+        for obj in list_of_objects:
+            if obj.objectName() == "stack_piece_counter_" + piece_name:
+                obj.setText(str(int(obj.text()) + 1))
