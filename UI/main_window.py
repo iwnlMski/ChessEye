@@ -1,5 +1,5 @@
 from PyQt6 import QtGui, QtWidgets
-from const import DEFAULT_BOARD_IMAGES, TILE_SIZE, Piece
+from const import DEFAULT_BOARD_IMAGES, TILE_SIZE, PieceImage, LabelType
 from PyQt6.QtCore import Qt
 from custom_label import QLabelCustom
 from helper_functions import LabelHelperFunctions
@@ -21,68 +21,67 @@ class MainWindow(QtWidgets.QMainWindow):
                 QLabelCustom(
                     parent=self.centralwidget,
                     filename=DEFAULT_BOARD_IMAGES.get(
-                        f"{chr(char)}{i}", "../img/blank.png"),
-                    objectName=f"board_tile_{chr(char)}{i}",
+                        f"{chr(char)}{i}", ""),
+                    objectName=f"{LabelType.TILE.value}{chr(char)}{i}",
                     geometry=((char-ord("A"))*TILE_SIZE, (i-1)
                               * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                 )
 
-        for i, piece in enumerate(Piece):
+        for i, piece in enumerate(PieceImage):
             x_coord = 500 if "WHITE" in piece.name else 560
             QLabelCustom(
                 parent=self.centralwidget,
                 filename=piece.value,
-                objectName=f"stack_piece_{piece.name.lower()}",
+                objectName=f"{LabelType.STACK_PIECE.value}{piece.name.lower()}",
                 geometry=(x_coord, (i % 6) * TILE_SIZE, TILE_SIZE, TILE_SIZE),
                 is_board_tile=False
             )
-            var = QtWidgets.QLabel(
+            QtWidgets.QLabel(
                 parent=self.centralwidget,
                 text="0",
-                objectName=f"piece_counter_{piece.name.lower()}",
-            )
-            var.setGeometry(x_coord, (i % 6) * TILE_SIZE, 9, 9)
+                objectName=f"{LabelType.PIECE_COUNTER.value}{piece.name.lower()}",
+            ).setGeometry(x_coord, (i % 6) * TILE_SIZE, 9, 9)
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         event.accept()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
-        drop_position_label = LabelHelperFunctions.get_board_tile_from_position(
-            event.position().x(), event.position().y(), self.centralwidget.children())
-        dragged_label = LabelHelperFunctions.get_label_by_dragged_status(
-            self.centralwidget.children())
+        widget_list = self.centralWidget().children()
+        dragged_piece = LabelHelperFunctions.get_label_by_dragged_status(
+            widget_list)
+        new_board_tile = LabelHelperFunctions.get_board_tile_from_position(
+            event.position().x(), event.position().y(), widget_list)
 
-        if drop_position_label and dragged_label:
-            if "board_tile" in dragged_label.objectName():
-                if drop_position_label.filename and dragged_label.filename.split("_")[0] != drop_position_label.filename.split("_")[0]:
+        if not dragged_piece:
+            return
+
+        if new_board_tile:
+            if LabelType.TILE.value in dragged_piece.objectName():
+                if dragged_piece.piece_color != new_board_tile.piece_color:
                     LabelHelperFunctions.update_piece_stack(
-                        drop_position_label, self.centralWidget().children())
+                        new_board_tile, widget_list)
                     LabelHelperFunctions.delete_piece_from_board(
-                        drop_position_label)
+                        new_board_tile)
                 LabelHelperFunctions.swap_two_labels(
-                    dragged_label, drop_position_label)
+                    dragged_piece, new_board_tile)
 
-                event.setDropAction(Qt.DropActions.MoveAction)
-                event.accept()
-            elif "stack_piece" in dragged_label.objectName():
-                if drop_position_label.filename:
+            elif LabelType.STACK_PIECE.value in dragged_piece.objectName():
+                if new_board_tile.filename:
                     LabelHelperFunctions.update_piece_stack(
-                        drop_position_label, self.centralWidget().children())
+                        new_board_tile, widget_list)
                     LabelHelperFunctions.delete_piece_from_board(
-                        drop_position_label)
+                        new_board_tile)
                 LabelHelperFunctions.add_piece_from_stack(
-                    dragged_label, drop_position_label, self.centralWidget().children())
-
-                event.setDropAction(Qt.DropActions.MoveAction)
-                event.accept()
-        elif dragged_label and not drop_position_label:
-            if isinstance(dragged_label, QLabelCustom):
+                    dragged_piece, new_board_tile, widget_list)
+                    
+        elif not new_board_tile:
+            if LabelType.TILE.value in dragged_piece.objectName():
                 LabelHelperFunctions.update_piece_stack(
-                    dragged_label, self.centralWidget().children())
-                LabelHelperFunctions.delete_piece_from_board(dragged_label)
+                    dragged_piece, widget_list)
+                LabelHelperFunctions.delete_piece_from_board(dragged_piece)
 
-                event.setDropAction(Qt.DropActions.MoveAction)
-                event.accept()
+        event.setDropAction(Qt.DropActions.MoveAction)
+        event.accept()
 
 
 if __name__ == "__main__":

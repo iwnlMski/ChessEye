@@ -1,4 +1,4 @@
-from const import TILE_SIZE
+from const import TILE_SIZE, LabelType
 from typing import List, Union
 from PyQt6.QtCore import QObject
 from custom_label import QLabelCustom
@@ -8,13 +8,13 @@ class LabelHelperFunctions():
     @staticmethod
     def get_board_tile_from_position(x: int, y: int, list_of_objects: List[QObject]) -> Union[QLabelCustom, None]:
         for obj in list_of_objects:
-            if "board_tile" in obj.objectName() and x in range(obj.x(), obj.x() + TILE_SIZE) and y in range(obj.y(), obj.y() + TILE_SIZE):
+            if LabelType.TILE.value in obj.objectName() and x in range(obj.x(), obj.x() + TILE_SIZE) and y in range(obj.y(), obj.y() + TILE_SIZE):
                 return obj
 
     @staticmethod
     def get_label_by_dragged_status(list_of_objects: List[QObject]) -> Union[QLabelCustom, None]:
         for obj in list_of_objects:
-            if "piece_counter" not in obj.objectName() and obj.dragged_status:
+            if LabelType.PIECE_COUNTER.value not in obj.objectName() and obj.dragged_status:
                 obj.dragged_status = False
                 return obj
 
@@ -30,12 +30,11 @@ class LabelHelperFunctions():
         piece_name = label_1.filename.replace(
             "../img/", "").replace(".png", "")
         for obj in list_of_objects:
-            if obj.objectName() == "piece_counter_" + piece_name:
+            if obj.objectName() == LabelType.PIECE_COUNTER.value + piece_name:
                 if int(obj.text()) > 0:
                     label_2.setPixmap(label_1.filename)
                     obj.setText(str(int(obj.text()) - 1))
-                else:
-                    return
+                return
 
     @staticmethod
     def delete_piece_from_board(label_1: QLabelCustom):
@@ -46,5 +45,5 @@ class LabelHelperFunctions():
         piece_name = label_1.filename.replace(
             "../img/", "").replace(".png", "")
         for obj in list_of_objects:
-            if obj.objectName() == "piece_counter_" + piece_name:
+            if obj.objectName() == LabelType.PIECE_COUNTER.value + piece_name:
                 obj.setText(str(int(obj.text()) + 1))
