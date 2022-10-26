@@ -55,3 +55,4 @@ class Piece(Enum):
 class Color(Enum):
     WHITE = "white"
     BLACK = "black"
+    NOT_SET = ""
