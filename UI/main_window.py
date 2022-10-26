@@ -16,31 +16,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self, objectName="centralwidget")
         self.setCentralWidget(self.centralwidget)
 
-        for i in range(8, 0, -1):
-            for char in range(ord("A"), ord("I")):
-                QLabelCustom(
-                    parent=self.centralwidget,
-                    filename=DEFAULT_BOARD_IMAGES.get(
-                        f"{chr(char)}{i}", ""),
-                    objectName=f"{LabelType.TILE.value}{chr(char)}{i}",
-                    geometry=((char-ord("A"))*TILE_SIZE, (i-1)
-                              * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                )
-
-        for i, piece in enumerate(PieceImage):
-            x_coord = 500 if "WHITE" in piece.name else 560
-            QLabelCustom(
-                parent=self.centralwidget,
-                filename=piece.value,
-                objectName=f"{LabelType.STACK_PIECE.value}{piece.name.lower()}",
-                geometry=(x_coord, (i % 6) * TILE_SIZE, TILE_SIZE, TILE_SIZE),
-                is_board_tile=False
-            )
-            QtWidgets.QLabel(
-                parent=self.centralwidget,
-                text="0",
-                objectName=f"{LabelType.PIECE_COUNTER.value}{piece.name.lower()}",
-            ).setGeometry(x_coord, (i % 6) * TILE_SIZE, 9, 9)
+        self.set_up_board_tiles()
+        self.set_up_side_stacks()
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         event.accept()
@@ -73,7 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         new_board_tile)
                 LabelHelperFunctions.add_piece_from_stack(
                     dragged_piece, new_board_tile, widget_list)
-                    
+
         elif not new_board_tile:
             if LabelType.TILE.value in dragged_piece.objectName():
                 LabelHelperFunctions.update_piece_stack(
@@ -82,6 +59,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
         event.setDropAction(Qt.DropActions.MoveAction)
         event.accept()
+    
+    def set_up_board_tiles(self):
+        for i in range(8, 0, -1):
+            for char in range(ord("A"), ord("I")):
+                QLabelCustom(
+                    parent=self.centralwidget,
+                    filename=DEFAULT_BOARD_IMAGES.get(
+                        f"{chr(char)}{i}", ""),
+                    objectName=f"{LabelType.TILE.value}{chr(char)}{i}",
+                    geometry=((char-ord("A"))*TILE_SIZE, (i-1)
+                              * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                )
+    
+    def set_up_side_stacks(self):
+        for i, piece in enumerate(PieceImage):
+            x_coord = 500 if "WHITE" in piece.name else 560
+            QLabelCustom(
+                parent=self.centralwidget,
+                filename=piece.value,
+                objectName=f"{LabelType.STACK_PIECE.value}{piece.name.lower()}",
+                geometry=(x_coord, (i % 6) * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+                is_board_tile=False
+            )
+            QtWidgets.QLabel(
+                parent=self.centralwidget,
+                text="0",
+                objectName=f"{LabelType.PIECE_COUNTER.value}{piece.name.lower()}",
+            ).setGeometry(x_coord, (i % 6) * TILE_SIZE, 9, 9)
 
 
 if __name__ == "__main__":
