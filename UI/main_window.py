@@ -1,8 +1,18 @@
 from PyQt6 import QtGui, QtWidgets
 from const import DEFAULT_BOARD_IMAGES, TILE_SIZE, PieceImage, LabelType
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QRect
 from custom_label import QLabelCustom
 from helper_functions import LabelHelperFunctions
+from board_state import BoardState
+
+
+class QPushButtonCustom(QtWidgets.QPushButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+
+        return super().mousePressEvent(event)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -15,6 +25,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.centralwidget = QtWidgets.QWidget(
             self, objectName="centralwidget")
         self.setCentralWidget(self.centralwidget)
+
+        self.pushButton = QPushButtonCustom(self.centralwidget)
+        self.pushButton.setGeometry(QRect(500, 170, 75, 24))
+        self.pushButton.setObjectName("pushButton")
 
         self.set_up_board_tiles()
         self.set_up_side_stacks()
@@ -59,7 +73,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         event.setDropAction(Qt.DropActions.MoveAction)
         event.accept()
-    
+
     def set_up_board_tiles(self):
         for i in range(8, 0, -1):
             for char in range(ord("A"), ord("I")):
@@ -71,7 +85,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     geometry=((char-ord("A"))*TILE_SIZE, (i-1)
                               * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                 )
-    
+
     def set_up_side_stacks(self):
         for i, piece in enumerate(PieceImage):
             x_coord = 500 if "WHITE" in piece.name else 560
@@ -88,10 +102,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 objectName=f"{LabelType.PIECE_COUNTER.value}{piece.name.lower()}",
             ).setGeometry(x_coord, (i % 6) * TILE_SIZE, 9, 9)
 
+    def get_board_state(self):
+        bs = BoardState(self.centralWidget().children())
+
+        print(bs.to_json())
+
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = MainWindow()
     MainWindow.show()
+    MainWindow.get_board_state()
     sys.exit(app.exec())
