@@ -11,10 +11,13 @@ class Board:
             Board.HEIGHT)] for row in range(Board.WIDTH)]
 
     def get_field(self, position: Position) -> Field:
-        if not (0 <= position.row < self.HEIGHT and 0 <= position.col <= self.WIDTH):
+        if not (0 <= position.row < self.HEIGHT and 0 <= position.col < self.WIDTH):
             raise ValueError(f"Invalid get_field position {position}")
 
         return self.board[position.row][position.col]
+
+    def add_piece(self, position, piece):
+        self.get_field(position).piece = piece
 
     def __str__(self):
         lines = []

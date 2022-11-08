@@ -28,3 +28,20 @@ class Position:
 
     def __str__(self) -> str:
         return Position.to_name(self)
+
+    def __add__(self, other):
+        if not isinstance(other, Position):
+            return NotImplemented
+        return Position(self.row + other.row, self.col + other.col)
+
+    def __mul__(self, other):
+        return Position(self.row * other, self.col * other)
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        return self.row == other.row and self.col == other.col

@@ -1,7 +1,6 @@
 
 from typing import List, Optional, Tuple
 from .engine import Engine
-from .field import Field
 from .piece import Piece
 from .player import Player
 from .board import Board
@@ -54,7 +53,7 @@ class Game:
         self.winner: Optional[Player] = self.won()
 
         for position, piece_type, piece_color in default_board:
-            self.board.get_field(position).piece = Piece(piece_type, piece_color)
+            self.board.add_piece(position, Piece(piece_type, piece_color))
 
     def switch_player(self):
         self.current_player = self.black_player if self.current_player.color is Player.Color.WHITE else self.white_player
@@ -65,18 +64,7 @@ class Game:
     def move(self, piece_position_name: str, target_position_name: str):
         piece_position = Position.from_name(piece_position_name)
         target_position = Position.from_name(target_position_name)
-        return self.__move(self.board.get_field(piece_position), self.board.get_field(target_position))
-
-    def __move(self, piece_field: Field, target_field: Field):
-        piece = piece_field.piece
-        if not piece:
-            raise RuntimeError(f"{piece_field} does not have a figure to move")
-
-        if (piece.color == Piece.Color.WHITE) != (self.current_player.color == Player.Color.WHITE):
-            raise RuntimeError(f"{self.current_player} tried to move other player {piece_field}")
-
-        Engine.move(self.board, piece_field, target_field)
-
+        Engine.move(piece_position, target_position, self.current_player.color, self.board)
         self.switch_player()
 
     def __str__(self):
