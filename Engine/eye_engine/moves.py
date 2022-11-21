@@ -1,59 +1,57 @@
-from ctypes import BigEndianStructure
-from .field import Field
-from .position import Position as Offset
+from typing import Dict, List, Optional, Tuple, Callable
+from .position import Position
 from .piece import Piece
 
 
-def capture(piece_field: Field, target_field: Field):
-    target_piece = target_field.piece
-    piece = piece_field.piece
-    return target_piece and piece and (target_field.color is not piece_field.color)
+rook_offsets = [[(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7)],
+                [(0, -1), (0, -2), (0, -3), (0, -4), (0, -5), (0, -6), (0, -7)],
+                [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0)],
+                [(-1, 0), (-2, 0), (-3, 0), (-4, 0), (-5, 0), (-6, 0), (-7, 0)]]
 
-
-def move(field_from: Field, field_to: Field):
-    return field_from.piece and not field_to.piece
-
-
-def move_or_capture(field_from: Field, field_to: Field):
-    return capture(field_from, field_to) or move(field_from, field_to)
-
-
-def pawn_double(field_from: Field, field_to: Field):
-    piece = field_from.piece
-    if not piece:
-        raise ValueError("No piece for pawn double forward move")
-    row = 1 if piece.color is Piece.Color.WHITE else 6
-    return move(field_from, field_to) if field_from.position.row is row else False
-
-
-rook_offsets = [[Offset(0, 1), Offset(0, 2), Offset(0, 3), Offset(0, 4), Offset(0, 5), Offset(0, 6), Offset(0, 7)],
-                [Offset(0, -1), Offset(0, -2), Offset(0, -3), Offset(
-                    0, -4), Offset(0, -5), Offset(0, -6), Offset(0, -7)],
-                [Offset(1, 0), Offset(2, 0), Offset(3, 0), Offset(
-                    4, 0), Offset(5, 0), Offset(6, 0), Offset(7, 0)],
-                [Offset(-1, 0), Offset(-2, 0), Offset(-3, 0), Offset(
-                    -4, 0), Offset(-5, 0), Offset(-6, 0), Offset(-7, 0)]]
-
-bishop_offsets = [[Offset(1, 1), Offset(2, 2), Offset(3, 3), Offset(4, 4), Offset(5, 5), Offset(6, 6), Offset(7, 7)],
-                  [Offset(-1, -1), Offset(-2, -2), Offset(-3, -3), Offset(-4, -4),
-                   Offset(-5, -5), Offset(-6, -6), Offset(-7, -7)],
-                  [Offset(1, -1), Offset(2, -2), Offset(3, -3), Offset(4, -4),
-                   Offset(5, -5), Offset(6, -6), Offset(7, -7)],
-                  [Offset(-1, 1), Offset(-2, 2), Offset(-3, 3), Offset(-4, 4), Offset(-5, 5), Offset(-6, 6), Offset(-7, 7)]]
-
-knight_offsets = [[Offset(2, 1)], [Offset(-2, -1)], [Offset(-2, 1)],
-                  [Offset(2, -1)], [Offset(1, 2)], [Offset(-1, -2)], [Offset(-1, 2)], [Offset(1, -2)]]
-
-king_offsets = [[Offset(0, 1)], [Offset(0, -1)], [Offset(1, 1)],
-                [Offset(-1, -1)], [Offset(1, 0)], [Offset(-1, 0)], [Offset(-1, 1)], [Offset(1, -1)]]
+bishop_offsets = [[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)],
+                  [(-1, -1), (-2, -2), (-3, -3), (-4, -4), (-5, -5), (-6, -6), (-7, -7)],
+                  [(1, -1), (2, -2), (3, -3), (4, -4), (5, -5), (6, -6), (7, -7)],
+                  [(-1, 1), (-2, 2), (-3, 3), (-4, 4), (-5, 5), (-6, 6), (-7, 7)]]
 
 queen_offsets = rook_offsets + bishop_offsets
 
-moves = {
-    Piece.Type.PAWN: {move: [[Offset(1, 0)]], pawn_double: [[Offset(2, 0)]]},
+knight_offsets = [[(2, 1)], [(-2, -1)], [(-2, 1)], [(2, -1)], [(1, 2)], [(-1, -2)], [(-1, 2)], [(1, -2)]]
+king_offsets = [[(0, 1)], [(0, -1)], [(1, 1)], [(-1, -1)], [(1, 0)], [(-1, 0)], [(-1, 1)], [(1, -1)]]
+pawn_capture_offsets = [[(1, 1)], [(1, -1)]]
+pawn_move_offsets = [[(1, 0)], [(2, 0)]]
+
+
+def capture(piece: Piece, target: Piece):
+    return piece.is_opponent(target)
+
+
+def move(_: Piece, target: Piece):
+    return target.is_empty()
+
+
+def move_or_capture(piece: Piece, target: Piece):
+    return capture(piece, target) or move(piece, target)
+
+
+def move_pawn(piece: Piece, target: Piece):
+    default_row = 1 if piece.is_white() else 6
+    return move(piece, target) if (piece.position.row is default_row) or abs(target.position.row - piece.position.row) == 1 else False
+
+
+moves: Dict[Piece.Type, Dict[Callable[[Piece, Piece], bool], List[List[Tuple[int, int]]]]] = {
+    Piece.Type.PAWN: {move_pawn: pawn_move_offsets, capture: pawn_capture_offsets},
     Piece.Type.KNIGHT: {move_or_capture: knight_offsets},
     Piece.Type.KING: {move_or_capture: king_offsets},
     Piece.Type.ROOK: {move_or_capture: rook_offsets},
     Piece.Type.BISHOP: {move_or_capture: bishop_offsets},
     Piece.Type.QUEEN: {move_or_capture: queen_offsets}
 }
+
+
+def try_apply_offset(position: Position, offset: Tuple[int, int], mirror_offset: bool = False) -> Optional[Position]:
+    direction: int = -1 if mirror_offset else 1
+    row = position.row + direction * offset[0]
+    col = position.col + direction * offset[1]
+    if 0 <= row <= 7 and 0 <= col <= 7 and (name := Position.to_name(col, row)):
+        return Position(name)
+    return None

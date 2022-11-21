@@ -1,18 +1,17 @@
 from logging import error, basicConfig
 
-import eye_engine
+from eye_engine import Game, Font
 
-FONT_RED = "\x1b[31;1m"
-FONT_CLEAR = '\033[0m'
-basicConfig(format=f"\t{FONT_RED}%(message)s{FONT_CLEAR}")
+basicConfig(format=f"\t{Font.RED}%(message)s{Font.CLEAR}")
 
 
 def main():
-    game = eye_engine.Game()
+    game = Game()
     print(game)
 
     while not game.won():
-        move = input("Input move (eg. a2a4): ")
+        move = input(
+            f"{game.current_player} to move (eg. a2a4): {Font.BLUE if game.current_player.owns_black() else Font.WHITE}")
         if len(move) != 4:
             error(f"Input {move} length invald")
             continue
